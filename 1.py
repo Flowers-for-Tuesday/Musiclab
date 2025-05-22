@@ -2,6 +2,7 @@ from manim import *
 from MusicSvg import MusicSvg 
 from MusicTex import MusicTex
 from showlabel import showlabel
+from MusicAudio import MusicAudio
 from music21 import *
 
 class ShowLilyPondSVG(Scene):
@@ -39,9 +40,24 @@ class ShowLilyPondSVG(Scene):
         piano_part.append(staff)
         s.insert(0, piano_part)
         music1 = MusicTex(s)
+        audio1 = MusicAudio(s)
+        self.add_sound(audio1.wav_path)
+        music2 = MusicTex(s,clef_on=False)
+        music3 = MusicTex(s,timesignature_on=False)
+        music4 = MusicTex(s,barline_on=False)
+        music5 = MusicTex(s,staffsymbol_on=False)
         #showlabel(music1,'music1')
         self.play(Write(music1))
-        self.wait(2)
+        self.wait(1)
+        self.play(Transform(music1,music2))
+        self.wait(1)
+        self.play(Transform(music1,music3))
+        self.wait(1)
+        self.play(Transform(music1,music4))
+        self.wait(1)
+        self.play(Transform(music1,music5))
+        self.wait(1)
+
 
         
 

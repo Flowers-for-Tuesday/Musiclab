@@ -15,9 +15,10 @@ class MusicTex(SVGMobject):
         lilypond_executable=r".\lilypond-2.24.4\bin\lilypond.exe",
         svg_output_folder="svg_output",
         line_width=3,
-        measure_on=True,#是否有小节线
+        barline_on=True,#是否有小节线
         clef_on=True,#是否有谱号
         timesignature_on=True,#是否有拍号
+        staffsymbol_on=True,#是否有五线谱
         **kwargs
     ):
         """
@@ -31,9 +32,10 @@ class MusicTex(SVGMobject):
         self._tmp_dir = tempfile.TemporaryDirectory()
         tmpdir = self._tmp_dir.name
 
-        self.measure_on = measure_on 
+        self.barline_on = barline_on 
         self.clef_on = clef_on
         self.timesignature_on = timesignature_on
+        self.staffsymbol_on = staffsymbol_on
 
         # 保存 MusicXML
         self.musicxml_file = os.path.join(tmpdir, "score.musicxml")
@@ -85,13 +87,14 @@ class MusicTex(SVGMobject):
 
         output_lines = []
 
-        if not self.measure_on:
-            # 在最开头加上 layout 块
-            output_lines.append('\\layout {\n  \\cadenzaOn\n}\n\n')
+        if not self.barline_on:
+            output_lines.append('\\layout {\n  \\omit Staff.BarLine\n}\n\n')
         if not self.clef_on:
             output_lines.append('\\layout {\n  \\omit Staff.Clef\n}\n\n')
         if not self.timesignature_on:
             output_lines.append('\\layout {\n  \\omit Staff.TimeSignature\n}\n\n')
+        if not self.staffsymbol_on:
+            output_lines.append('\\layout {\n  \\omit Staff.StaffSymbol\n}\n\n')
 
         inside_header = False
         for line in lines:
