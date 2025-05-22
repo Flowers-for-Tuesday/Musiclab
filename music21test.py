@@ -76,7 +76,7 @@ for n in bass_line:
 score.append([soprano, bass])
 score.metadata = None
 # 6. 展示并保存为 MusicXML 文件（你也可以保存为 MIDI、PDF 等）
-score.write('musicxml', fp='score.musicxml')
+score.write('musicxml', fp=r'C:\Users\XMZ\AppData\Local\Temp\score.musicxml')
 
 # 若你有 MuseScore 安装好，可直接使用：
 #score.show()  # 直接调用 MuseScore 打开
