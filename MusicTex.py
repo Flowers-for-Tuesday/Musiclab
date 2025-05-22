@@ -6,7 +6,6 @@ import shutil
 import uuid
 from manim import SVGMobject,Line
 
-
 class MusicTex(SVGMobject):
     def __init__(
         self,
@@ -16,6 +15,7 @@ class MusicTex(SVGMobject):
         lilypond_executable=r".\lilypond-2.24.4\bin\lilypond.exe",
         svg_output_folder="svg_output",
         line_width=3,
+        measure_on=True,#是否有小节线
         **kwargs
     ):
         """
@@ -28,6 +28,8 @@ class MusicTex(SVGMobject):
         """
         self._tmp_dir = tempfile.TemporaryDirectory()
         tmpdir = self._tmp_dir.name
+
+        self.measure_on = measure_on 
 
         # 保存 MusicXML
         self.musicxml_file = os.path.join(tmpdir, "score.musicxml")
@@ -78,18 +80,28 @@ class MusicTex(SVGMobject):
             lines = f.readlines()
 
         output_lines = []
+
+        if not self.measure_on:
+            # 在最开头加上 layout 块
+            output_lines.append('\\layout {\n  \\cadenzaOn\n}\n\n')
+
         inside_header = False
         for line in lines:
             stripped = line.strip()
+
+            # 跳过 header 块
             if stripped.startswith(r'\header'):
                 inside_header = True
                 continue
             if inside_header and '}' in stripped:
                 inside_header = False
                 continue
-            if not inside_header:
-                output_lines.append(line)
+            if inside_header:
+                continue
 
+            output_lines.append(line)
+
+        # 隐藏默认 tagline
         if not any('tagline = ##f' in l for l in output_lines):
             output_lines.append('\n\\paper {\n  tagline = ##f\n}\n')
 

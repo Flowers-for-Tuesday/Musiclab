@@ -21,11 +21,15 @@
   }
 }
 
+
 \score {
-  \relative c' {
-    \cadenzaOn
-    \key c \major
-    \time 4/4
-    c4 d e f g a b e f g f e f f g g  a 
-  }
+  <<
+    \new Staff {
+      \relative c' { c4 d e f | g a b c | }
+    }
+    \new Staff {
+      \clef bass
+      \relative c { c4 b a g | f e d c | }
+    }
+  >>
 }

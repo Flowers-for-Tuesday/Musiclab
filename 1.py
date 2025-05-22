@@ -17,7 +17,7 @@ class ShowLilyPondSVG(Scene):
         part.append(meter.TimeSignature('4/4'))
 
         # 添加四个音符 C D E F
-        notes = ['C4', 'D4', 'E4', 'F4']
+        notes = ['C4', 'D4', 'E4','F4']
         for pitch in notes:
             n = note.Note(pitch)
             n.quarterLength = 1  # 每个音符一个四分音符时值
@@ -38,14 +38,13 @@ class ShowLilyPondSVG(Scene):
 
         # 设置调号（C大调）和拍号（4/4）
         part.append(key.KeySignature(0))       # 0 代表 C 大调/A 小调
-        part.append(meter.TimeSignature('4/4'))
         notes = ['C4', 'D4', 'E4', 'F4','G4']
         for pitch in notes:
             n = note.Note(pitch)
             n.quarterLength = 1  # 每个音符一个四分音符时值
             part.append(n)
         score2.append(part)
-        music2 = MusicTex(score2)
+        music2 = MusicTex(score2,measure_on=False)
         self.play(Transform(music1,music2))
         self.wait(2)
 
