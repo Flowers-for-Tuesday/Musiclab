@@ -1,2 +1,3 @@
 5.musictex类，支持clef/signature/measure on/off，color
 6.musicsvg类，支持绝大多数音乐符号调用
+7.Piano类，支持钢琴模型展示

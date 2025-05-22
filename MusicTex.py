@@ -4,7 +4,7 @@ import music21
 import subprocess
 import shutil
 import uuid
-from manim import SVGMobject
+from manim import SVGMobject,Line
 
 
 class MusicTex(SVGMobject):
@@ -15,6 +15,7 @@ class MusicTex(SVGMobject):
         python_executable=r".\lilypond-2.24.4\bin\python.exe",
         lilypond_executable=r".\lilypond-2.24.4\bin\lilypond.exe",
         svg_output_folder="svg_output",
+        line_width=3,
         **kwargs
     ):
         """
@@ -55,6 +56,7 @@ class MusicTex(SVGMobject):
             raise FileNotFoundError(f"找不到生成的 SVG 文件: {self.svg_output_path}")
 
         super().__init__(file_name=self.svg_output_path, **kwargs)
+        self._fix_svg_lines(line_width)#修复五线谱显示错误
 
     def _convert_musicxml_to_ly(self, musicxml_path, ly_output_path, python_exe, script_path):
         cmd = [python_exe, script_path, musicxml_path]
@@ -113,6 +115,11 @@ class MusicTex(SVGMobject):
         except subprocess.CalledProcessError as e:
             print("SVG 生成失败：", e)
             return False
+        
+    def _fix_svg_lines(self, width=3):
+        for submobj in self.submobjects:
+            if isinstance(submobj, Line):
+                submobj.set_stroke(width=width)
 
     def __del__(self):
         try:

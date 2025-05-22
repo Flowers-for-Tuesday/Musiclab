@@ -10,7 +10,6 @@ class ShowLilyPondSVG(Scene):
         # 创建一个新的乐谱对象
         score = stream.Score()
 
-        # 创建一个新的乐段（Part），可以是钢琴、长笛等任意乐器
         part = stream.Part()
 
         # 设置调号（C大调）和拍号（4/4）
@@ -40,20 +39,13 @@ class ShowLilyPondSVG(Scene):
         # 设置调号（C大调）和拍号（4/4）
         part.append(key.KeySignature(0))       # 0 代表 C 大调/A 小调
         part.append(meter.TimeSignature('4/4'))
-        notes = ['D4', 'E4', 'F4', 'G4']
+        notes = ['C4', 'D4', 'E4', 'F4','G4']
         for pitch in notes:
             n = note.Note(pitch)
             n.quarterLength = 1  # 每个音符一个四分音符时值
             part.append(n)
         score2.append(part)
         music2 = MusicTex(score2)
-        music2[0].set_stroke(width=3)
-        music2[1].set_stroke(width=3)
-        music2[2].set_stroke(width=3)
-        music2[3].set_stroke(width=3)
-        music2[4].set_stroke(width=3)
         self.play(Transform(music1,music2))
         self.wait(2)
-
-
 
