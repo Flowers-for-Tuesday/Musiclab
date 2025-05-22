@@ -16,6 +16,8 @@ class MusicTex(SVGMobject):
         svg_output_folder="svg_output",
         line_width=3,
         measure_on=True,#是否有小节线
+        clef_on=True,#是否有谱号
+        timesignature_on=True,#是否有拍号
         **kwargs
     ):
         """
@@ -30,6 +32,8 @@ class MusicTex(SVGMobject):
         tmpdir = self._tmp_dir.name
 
         self.measure_on = measure_on 
+        self.clef_on = clef_on
+        self.timesignature_on = timesignature_on
 
         # 保存 MusicXML
         self.musicxml_file = os.path.join(tmpdir, "score.musicxml")
@@ -84,6 +88,10 @@ class MusicTex(SVGMobject):
         if not self.measure_on:
             # 在最开头加上 layout 块
             output_lines.append('\\layout {\n  \\cadenzaOn\n}\n\n')
+        if not self.clef_on:
+            output_lines.append('\\layout {\n  \\omit Staff.Clef\n}\n\n')
+        if not self.timesignature_on:
+            output_lines.append('\\layout {\n  \\omit Staff.TimeSignature\n}\n\n')
 
         inside_header = False
         for line in lines:

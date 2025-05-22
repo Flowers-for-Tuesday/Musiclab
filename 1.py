@@ -25,7 +25,7 @@ class ShowLilyPondSVG(Scene):
 
         # 将乐段添加到乐谱
         score.append(part)
-        music1 = MusicTex(score)
+        music1 = MusicTex(score,clef_on=False)
         self.play(Write(music1))
         self.wait(2)
 
@@ -44,7 +44,7 @@ class ShowLilyPondSVG(Scene):
             n.quarterLength = 1  # 每个音符一个四分音符时值
             part.append(n)
         score2.append(part)
-        music2 = MusicTex(score2,measure_on=False)
+        music2 = MusicTex(score2,measure_on=False,timesignature_on=False)
         self.play(Transform(music1,music2))
         self.wait(2)
 
