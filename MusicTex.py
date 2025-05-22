@@ -3,6 +3,7 @@ import tempfile
 import music21
 import subprocess
 import shutil
+import uuid
 from manim import SVGMobject
 
 
@@ -31,9 +32,12 @@ class MusicTex(SVGMobject):
         self.musicxml_file = os.path.join(tmpdir, "score.musicxml")
         score.write("musicxml", fp=self.musicxml_file)
 
+        unique_prefix = f"score_{uuid.uuid4().hex[:8]}"
         self.intermediate_ly = os.path.join(tmpdir, "score.ly")
         self.processed_ly = os.path.join(tmpdir, "score_processed.ly")
+        self.svg_basename = unique_prefix
         self.svg_output_folder = svg_output_folder
+        self.svg_output_path = os.path.join(self.svg_output_folder, f"{self.svg_basename}.svg")
 
         # === 步骤 1: 转换为 .ly 文件 === #
         if not self._convert_musicxml_to_ly(self.musicxml_file, self.intermediate_ly, python_executable, musicxml2ly_script):
@@ -47,11 +51,10 @@ class MusicTex(SVGMobject):
             raise RuntimeError("生成 SVG 文件失败")
 
         # === 步骤 4: 读取 SVG 文件 === #
-        svg_path = os.path.join(self.svg_output_folder, "score_processed.svg")
-        if not os.path.isfile(svg_path):
-            raise FileNotFoundError(f"找不到生成的 SVG 文件: {svg_path}")
+        if not os.path.isfile(self.svg_output_path):
+            raise FileNotFoundError(f"找不到生成的 SVG 文件: {self.svg_output_path}")
 
-        super().__init__(file_name=svg_path, **kwargs)
+        super().__init__(file_name=self.svg_output_path, **kwargs)
 
     def _convert_musicxml_to_ly(self, musicxml_path, ly_output_path, python_exe, script_path):
         cmd = [python_exe, script_path, musicxml_path]
@@ -100,12 +103,12 @@ class MusicTex(SVGMobject):
         cmd = [
             lilypond_exe,
             '-dbackend=svg',
-            '-o', output_dir,
+            '-o', os.path.join(output_dir, self.svg_basename),  # 添加文件名前缀
             ly_path
         ]
         try:
             subprocess.run(cmd, check=True)
-            print("SVG 文件生成成功")
+            print(f"SVG 文件生成成功：{self.svg_output_path}")
             return True
         except subprocess.CalledProcessError as e:
             print("SVG 生成失败：", e)
