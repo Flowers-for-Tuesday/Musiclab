@@ -4,7 +4,7 @@ import music21
 import subprocess
 import shutil
 import uuid
-from manim import SVGMobject,Line
+from manim import *
 
 class MusicTex(SVGMobject):
     def __init__(

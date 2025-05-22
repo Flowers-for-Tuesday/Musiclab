@@ -1,5 +1,3 @@
 # This file is used internally by FFMPEG.
-file 'file:C:/Users/XMZ/Desktop/Notamia/media/videos/1/2160p60/partial_movie_files/ShowLilyPondSVG/670651367_3064173561_223132457.mp4'
-file 'file:C:/Users/XMZ/Desktop/Notamia/media/videos/1/2160p60/partial_movie_files/ShowLilyPondSVG/577047595_1219373736_529626539.mp4'
-file 'file:C:/Users/XMZ/Desktop/Notamia/media/videos/1/2160p60/partial_movie_files/ShowLilyPondSVG/577047595_3983951696_1379264953.mp4'
-file 'file:C:/Users/XMZ/Desktop/Notamia/media/videos/1/2160p60/partial_movie_files/ShowLilyPondSVG/577047595_1219373736_979378828.mp4'
+file 'file:C:/Users/XMZ/Desktop/Notamia/media/videos/1/2160p60/partial_movie_files/ShowLilyPondSVG/670651367_1370511795_223132457.mp4'
+file 'file:C:/Users/XMZ/Desktop/Notamia/media/videos/1/2160p60/partial_movie_files/ShowLilyPondSVG/577047595_1219373736_3305220813.mp4'
