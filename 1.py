@@ -15,7 +15,7 @@ class ShowLilyPondSVG(Scene):
         audio1 = MusicAudio(score)
         piano1 = MultiOctavePianoKeyboard(octaves=6).scale(0.6).shift(UP*2)
         #showlabel(music1,'music1')
-        self.play(Write(music1),run_time = 6)
+        self.play(Write(music1),run_time = 4)
         self.play(FadeIn(piano1))
         self.add_sound(audio1.wav_path, time_offset=0.3)
         for event in score_events(score,relative_octave=2,bpm=100):
