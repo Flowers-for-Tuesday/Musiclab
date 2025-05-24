@@ -89,7 +89,9 @@ def add_notes(
 
     m = stream.Measure()
     for pitch, dur in notes:
-        if isinstance(pitch, list):
+        if pitch == "rest":
+            n = note.Rest()
+        elif isinstance(pitch, list):
             n = chord.Chord(pitch)
         else:
             n = note.Note(pitch)
