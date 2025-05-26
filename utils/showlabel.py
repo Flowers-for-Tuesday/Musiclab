@@ -3,8 +3,9 @@ from manim import *
 from music21 import *
 
 def showlabel(svgmob, filename):
-    from manim import Scene, FullScreenRectangle, index_labels
-
+    '''
+    用于展示SVGMobjects的sub对象标签,filename为输出文件名
+    '''
     bg = FullScreenRectangle(fill_color=WHITE, fill_opacity=1)
     labels = index_labels(svgmob)
 
