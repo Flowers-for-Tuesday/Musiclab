@@ -159,8 +159,18 @@ class PianoKeyboard(VGroup):
 
 
 class MultiOctavePianoKeyboard(VGroup):
-    def __init__(self, octaves=2, whiteWidth=0.5, **kwargs):
+    def __init__(
+            self, 
+            octaves=2, #跨多少八度
+            start_octave: int = 4,#起始C音符音高
+            show_labels: bool = False,#是否显示标签
+            whiteWidth=0.5,
+            **kwargs
+        ):
+
         super().__init__()
+        self.octaves = octaves
+        self.start_octave = start_octave
         wo = whiteWidth * 7
         mob_keyboardTemplate = PianoKeyboard(whiteWidth=whiteWidth, **kwargs)
 
@@ -169,6 +179,8 @@ class MultiOctavePianoKeyboard(VGroup):
             self.add(mob_keyboard)
 
         self.move_to(ORIGIN) #初始化到中央位置
+
+        if show_labels: self._add_labels()
 
     def markKey(self, key: int, /, markColor: _MarkColorType | None = None):
         octave, idx = divmod(key, 12)
@@ -200,7 +212,23 @@ class MultiOctavePianoKeyboard(VGroup):
         return self
 
     def alignToKey(self, key: int, mob: M, buff: float = 0.2) -> M:
+        '''
+        将mob移动到指定key位置
+        '''
         mob_key = self.getKey(key)
         mob.move_to(mob_key).align_to(mob_key, DOWN).shift(UP * buff)
         return mob
+    
+    def _add_labels(self):
+        note_names = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"]
+        for i in range(self.octaves*12):
+            midi = self.start_octave*12 + i
+            pitch_class = midi % 12
+            octave = midi // 12
+            if (pitch_class in [0,2,4,5,7,9,11]):
+                label = Text(f"{note_names[pitch_class]}{octave}",color=BLACK).scale(0.4)
+            else:
+                label = Text(f"{note_names[pitch_class]}\n  {octave}",color=WHITE).scale(0.27)
+            self.alignToKey(i, label)
+            self.add(label)
 

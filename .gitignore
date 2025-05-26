@@ -1,6 +1,10 @@
 *.mp4
 *.txt
 *.pptx
+1.py
 draft.py
+draft2.py
 *.png
 *.wav
+tempCodeRunnerFile.py
+__pycache__/

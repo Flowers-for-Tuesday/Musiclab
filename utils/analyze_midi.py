@@ -28,14 +28,14 @@ def analyze_midi(file_path: str):
                 pitch = n.pitch.nameWithOctave
                 duration = n.quarterLength
                 offset = n.offset
-                print(f"Note: {pitch}, Duration: {duration}, Offset: {offset}")
+                #print(f"Note: {pitch}, Duration: {duration}, Offset: {offset}")
                 # 存储为 ("E5", 0.5) 形式
                 notes_chords_list.append((pitch, duration))
             elif isinstance(n, chord.Chord):
                 pitches = [p.nameWithOctave for p in n.pitches]
                 duration = n.quarterLength
                 offset = n.offset
-                print(f"Chord: {pitches}, Duration: {duration}, Offset: {offset}")
+                #print(f"Chord: {pitches}, Duration: {duration}, Offset: {offset}")
                 # 存储为 (["G#5", "B5", "E6"], 1.0) 形式
                 notes_chords_list.append((pitches, duration))
 
