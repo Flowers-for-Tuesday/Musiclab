@@ -140,6 +140,7 @@ class MusicTex(SVGMobject):
             return False
         
     def _fix_svg_lines(self, width=3):
+        "修复线条错误"
         for submobj in self.submobjects:
             if isinstance(submobj, Line):
                 submobj.set_stroke(width=width)

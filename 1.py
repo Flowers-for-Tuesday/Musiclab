@@ -37,7 +37,7 @@ class ShowLilyPondSVG(Scene):
         self.play(Write(music1))
         self.play(FadeIn(piano))
         #self.add_sound(audio1.wav_path, time_offset=0)
-        self.play(Flash_around(piano[1]))
+        self.play(Flash(piano[1]))
         events = score_events(score1,relative_octave=3,bpm=120)
         print(events)
         self.wait(2)

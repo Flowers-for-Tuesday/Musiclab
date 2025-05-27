@@ -1,6 +1,10 @@
 from manim import *
 from music21 import *
-from Mobjects import *
+from .MusicTex import *
+
+__all__ = [
+    "CircleOfFifths",
+]
 
 KEY_DICT = {
     "C": key.Key("C"),
@@ -36,14 +40,51 @@ KEY_DICT = {
     "Abm": key.Key("Ab", "minor"),
 }
 
-class Flash(Scene):
-    def construct(self):
-        # 目标 Mobject：一个文字
-        self.camera.background_color = WHITE  # 改成你想要的颜色
-        blankscore = blank_score("D","4/4",["Treble","Bass"])
-        musictex = MusicTex(blankscore,timesignature_on=False,barline_on=False)
-        self.play(Write(musictex))
-        self.wait(1)
+class CircleOfFifths(VGroup):
+    def __init__(
+            self, radius=1.5, 
+            dot_radius=0.06,
+            show_scores = False,# 是否显示乐谱
+            **kwargs
+            ):
+        super().__init__(**kwargs)
+
+        # 标签内容（从C开始，顺时针，每隔纯五度）
+        labels = [
+            "C", "G", "D", "A", "E", "B", "F♯", "D♭",
+            "A♭", "E♭", "B♭", "F"
+        ]
+        labelscopy = [
+            "C", "G", "D", "A", "E", "B", "F#", "Db",
+            "Ab", "Eb", "Bb", "F"
+        ]
+
+        # 背景圆
+        circle = Circle(radius=radius, color=GREY_B, stroke_width=3)
+        self.add(circle)
+
+        # 添加12个点与标签
+        for i, label in enumerate(labels):
+            angle = PI / 2 - i * TAU / 12  # C 在顶部，逆时针增加角度
+            direction = np.array([np.cos(angle), np.sin(angle), 0])
+            point_pos = radius * direction
+
+            # Dot
+            dot = Dot(point_pos, radius=dot_radius, color=WHITE)
+            self.add(dot)
+
+            # Label
+            text = Text(label, font_size=32,weight=BOLD).scale(0.6)
+            text.move_to(point_pos + 0.4 * direction)  # 标签稍微偏离圆心方向
+            self.add(text)
+
+            if show_scores:
+                score = blank_score(labelscopy[i],"4/4",["Treble","Bass"])
+                musictex = MusicTex(score,line_width=1,barline_on=False,timesignature_on=False)
+                musictex.scale(0.4)
+                musictex.move_to(point_pos + 1.3 * direction)
+                musictex.set_color(WHITE)
+                self.add(musictex)
 
 def blank_score(
     key_signature: str,
