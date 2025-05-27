@@ -1,12 +1,22 @@
 from manim import *
 
-def flash_around(scene: Scene, mobj: Mobject, color=RED_A, run_time=3, buff=0.2, stroke_width=4,rest = False):
+def Flash_around(
+    mobj: Mobject, 
+    color=RED_A, 
+    run_time=3, 
+    buff=0.2, 
+    stroke_width=4, 
+    rest=False
+) -> Animation:
     """
-    在给定的 Scene 中，让一个路径沿着 mobject 的矩形边缘进行 ShowPassingFlash 闪动动画。
+    返回一个在 mobject 周围闪动的 Animation。
+    可用于 self.play(flash_around(...))
+    """
+    rect = SurroundingRectangle(mobj, buff=buff, color=color, stroke_width=stroke_width)
 
-    flash_around(self, group, color=ORANGE, run_time=2)
-    """
-    rect = SurroundingRectangle(mobj, buff=buff,color=color,stroke_width=stroke_width)
+    if rest:
+        return Write(rect, run_time=run_time)
+
     path = VMobject()
     path.set_points_as_corners([
         rect.get_corner(UL),
@@ -17,6 +27,4 @@ def flash_around(scene: Scene, mobj: Mobject, color=RED_A, run_time=3, buff=0.2,
     ])
     path.set_stroke(color=color, width=stroke_width, opacity=1)
 
-    if not rest : scene.play(ShowPassingFlash(path, time_width=0.3, run_time=run_time))
-    else : scene.play(Write(rect),run_time=run_time)
-    scene.wait(0.5)
+    return ShowPassingFlash(path, time_width=0.3, run_time=run_time)
