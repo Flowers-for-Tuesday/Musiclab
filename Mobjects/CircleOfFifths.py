@@ -1,6 +1,7 @@
 from manim import *
 from music21 import *
 from .MusicTex import *
+import re
 
 __all__ = [
     "CircleOfFifths",
@@ -42,9 +43,9 @@ KEY_DICT = {
 
 CHORD_DICT = {
     "major": [0,4,1],
-    "m": [0,8,11],
-    "dim":[0,9,6,3],
-    "aug":[0,4,8],
+    "minor": [0,8,11],
+    "diminished":[0,9,6,3],
+    "augmented":[0,4,8],
     "sus2":[0,2,1],
 }
 
@@ -117,6 +118,43 @@ class CircleOfFifths(VGroup):
         for mob in self.submobjects:
             if isinstance(mob, Text) or isinstance(mob, MusicTex):
                 mob.rotate(-angle, about_point=mob.get_center())
+
+    def show_chord(self, chord_type: str, root_index: int = 0,bpm:int=100) -> Succession:
+        """
+        在当前五度圈位置下，以 root_index 为根音（0~11），根据 chord_type（如 "dim"）显示和弦动画。
+        和弦结构从 CHORD_DICT 中读取，返回一个 Succession 。
+        """
+        if chord_type not in CHORD_DICT:
+            raise ValueError(f"Unknown chord type: {chord_type}")
+        if not (0 <= root_index < 12):
+            raise ValueError("root_index must be between 0 and 11")
+
+        intervals = CHORD_DICT[chord_type]
+        radius = 1.5
+        dots = []
+        lines = []
+
+        for i in intervals:
+            idx = (root_index + i) % 12
+            angle = PI / 2 - idx * TAU / 12
+            pos = radius * np.array([np.cos(angle), np.sin(angle), 0])
+            dot = Dot(pos, radius=0.08, color=BLUE_D)
+            dots.append(dot)
+
+        for i in range(len(dots)):
+            start = dots[i].get_center()
+            end = dots[(i + 1) % len(dots)].get_center()
+            line = Line(start, end, color=BLUE_D)
+            lines.append(line)
+
+        chord_fig = VGroup()
+        for i in range(len(dots)):
+            dot = dots[i]
+            line = lines[i]
+            chord_fig.add(dot)   # 先放进VGroup，方便管理
+            chord_fig.add(line)
+
+        return Succession(Create(chord_fig).set_run_time(60/bpm*len(intervals)),Wait(1),FadeOut(chord_fig))
 
 def blank_score(
     key_signature: str,
