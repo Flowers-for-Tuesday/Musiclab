@@ -4,7 +4,7 @@ from utils import *
 
 class S(Scene):
     def construct(self):
-        c = CircleOfFifths(show_scores=True)
+        c = CircleOfFifths(type="Major",show_scores=True)
         self.play(Create(c))
-        self.play(c.animate.scale(1.5))
+        self.play(c.animate.rotate_to_key("B"))
         self.wait(2)

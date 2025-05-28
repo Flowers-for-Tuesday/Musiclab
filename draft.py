@@ -1,92 +1,16 @@
 from manim import *
-from music21 import *
-from Mobjects import *
 
-KEY_DICT = {
-    "C": key.Key("C"),
-    "G": key.Key("G"),
-    "D": key.Key("D"),
-    "A": key.Key("A"),
-    "E": key.Key("E"),
-    "B": key.Key("B"),
-    "F#": key.Key("F#"),
-    "C#": key.Key("C#"),
-    "F": key.Key("F"),
-    "Bb": key.Key("Bb"),
-    "Eb": key.Key("Eb"),
-    "Ab": key.Key("Ab"),
-    "Db": key.Key("Db"),
-    "Gb": key.Key("Gb"),
-    "Cb": key.Key("Cb"),
+class SuccessionExample(Scene):
+            def construct(self):
+                dot1 = Dot(point=LEFT * 2 + UP * 2, radius=0.16, color=BLUE)
+                dot2 = Dot(point=LEFT * 2 + DOWN * 2, radius=0.16, color=MAROON)
+                dot3 = Dot(point=RIGHT * 2 + DOWN * 2, radius=0.16, color=GREEN)
+                dot4 = Dot(point=RIGHT * 2 + UP * 2, radius=0.16, color=YELLOW)
+                self.add(dot1, dot2, dot3, dot4)
 
-    "Am": key.Key("A", "minor"),
-    "Em": key.Key("E", "minor"),
-    "Bm": key.Key("B", "minor"),
-    "F#m": key.Key("F#", "minor"),
-    "C#m": key.Key("C#", "minor"),
-    "G#m": key.Key("G#", "minor"),
-    "D#m": key.Key("D#", "minor"),
-    "A#m": key.Key("A#", "minor"),
-    "Dm": key.Key("D", "minor"),
-    "Gm": key.Key("G", "minor"),
-    "Cm": key.Key("C", "minor"),
-    "Fm": key.Key("F", "minor"),
-    "Bbm": key.Key("Bb", "minor"),
-    "Ebm": key.Key("Eb", "minor"),
-    "Abm": key.Key("Ab", "minor"),
-}
-
-class Flash(Scene):
-    def construct(self):
-        # 目标 Mobject：一个文字
-        self.camera.background_color = WHITE  # 改成你想要的颜色
-        blankscore = blank_score("D","4/4",["Treble","Bass"])
-        musictex = MusicTex(blankscore,timesignature_on=False,barline_on=False)
-        self.play(Write(musictex))
-        self.wait(1)
-
-def blank_score(
-    key_signature: str,
-    time_signature: str,
-    parts: list[str],
-    bpm: int = 100
-) -> stream.Score:
-    """
-    创建一个空的 Score，包含指定声部和基础设置。
-    parts 是 ["Treble", "Bass"] 的子集。
-    """
-    valid_parts = {"Treble", "Bass"}
-    if not set(parts).issubset(valid_parts):
-        raise ValueError("parts must be subset of ['Treble', 'Bass']")
-    if not parts:
-        raise ValueError("parts must contain at least one of ['Treble', 'Bass']")
-    
-    k = KEY_DICT.get(key_signature)
-    if k is None:
-        raise ValueError(f"Unknown key signature: {key_signature}")
-
-    sc = stream.Score()
-    sc._part_dict = {}  # 自定义属性，方便后续访问
-
-    for part_name in parts:
-        p = stream.Part()
-        p.id = part_name
-        p.append(instrument.Piano())
-        if part_name == "Treble":
-            p.append(clef.TrebleClef())
-        else:
-            p.append(clef.BassClef())
-        p.append(k)
-        p.append(meter.TimeSignature(time_signature))
-        p.append(tempo.MetronomeMark(number=bpm))
-
-        # 添加一个全休符（空白音符）
-        m = stream.Measure(number=0)
-        r = note.Rest(quarterLength=2)
-        m.append(r)
-        p.append(m)
-
-        sc._part_dict[part_name] = p
-        sc.append(p)
-    
-    return sc
+                self.play(Succession(
+                    dot1.animate.move_to(dot2),
+                    dot2.animate.move_to(dot3),
+                    dot3.animate.move_to(dot4),
+                    dot4.animate.move_to(dot1)
+                ))

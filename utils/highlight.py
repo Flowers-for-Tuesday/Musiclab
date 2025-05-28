@@ -28,3 +28,10 @@ def Flash_around(
     path.set_stroke(color=color, width=stroke_width, opacity=1)
 
     return ShowPassingFlash(path, time_width=0.3, run_time=run_time)
+
+def blink(mobj, duration=0.2):
+    return Succession(
+        mobj.animate.set_color(RED_A).set_run_time(duration),
+        mobj.animate.set_color(WHITE).set_run_time(duration),
+        lag_ratio=0.4
+    )
