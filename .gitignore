@@ -1,10 +1,13 @@
 *.mp4
 *.txt
 *.pptx
+*.pdf
 1.py
 draft.py
 draft2.py
 *.png
 *.wav
+*.psd
 tempCodeRunnerFile.py
 __pycache__/
+Projects/
