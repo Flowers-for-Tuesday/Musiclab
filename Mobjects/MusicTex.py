@@ -6,6 +6,13 @@ import shutil
 import uuid
 from manim import *
 
+__all__ = [
+    "MusicTex",
+    "SCORE_WIDTH"
+]
+
+SCORE_WIDTH = 0.2730748225013653  #musictex默认大小时两条谱线的间距
+
 class MusicTex(SVGMobject):
     def __init__(
         self,

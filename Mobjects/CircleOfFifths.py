@@ -5,6 +5,7 @@ import re
 
 __all__ = [
     "CircleOfFifths",
+    "blank_score"
 ]
 
 KEY_DICT = {
@@ -47,6 +48,7 @@ CHORD_DICT = {
     "diminished":[0,9,6,3],
     "augmented":[0,4,8],
     "sus2":[0,2,1],
+    "dominant7":[0,8,6]
 }
 
 MajorLabels = [
@@ -144,7 +146,7 @@ class CircleOfFifths(VGroup):
         for i in range(len(dots)):
             start = dots[i].get_center()
             end = dots[(i + 1) % len(dots)].get_center()
-            line = Line(start, end, color=BLUE_D)
+            line = Line(start, end, color=BLUE_D, stroke_width=2)
             lines.append(line)
 
         chord_fig = VGroup()

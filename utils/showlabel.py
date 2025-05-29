@@ -1,8 +1,7 @@
 import os
 from manim import *
-from music21 import *
 
-def showlabel(svgmob, filename):
+def showlabel(svgmob):
     '''
     用于展示SVGMobjects的sub对象标签,filename为输出文件名
     '''
@@ -14,7 +13,7 @@ def showlabel(svgmob, filename):
             temp_self.add(bg)
             temp_self.add(svgmob)
             temp_self.add(labels)
-    output_path = os.path.join("./" +filename)
+    output_path = os.path.join("./showlabel")
     config.output_file = output_path
 
     scene = TempScene()
