@@ -121,7 +121,13 @@ class CircleOfFifths(VGroup):
             if isinstance(mob, Text) or isinstance(mob, MusicTex):
                 mob.rotate(-angle, about_point=mob.get_center())
 
-    def show_chord(self, chord_type: str, root_index: int = 0,bpm:int=100) -> Succession:
+    def show_chord(
+            self,
+            chord_type: str, 
+            root_index: int = 0,
+            color:ManimColor = BLUE_D,
+            bpm:int=100
+            ) -> Succession:
         """
         在当前五度圈位置下，以 root_index 为根音（0~11），根据 chord_type（如 "dim"）显示和弦动画。
         和弦结构从 CHORD_DICT 中读取，返回一个 Succession 。
@@ -140,13 +146,13 @@ class CircleOfFifths(VGroup):
             idx = (root_index + i) % 12
             angle = PI / 2 - idx * TAU / 12
             pos = radius * np.array([np.cos(angle), np.sin(angle), 0])
-            dot = Dot(pos, radius=0.08, color=BLUE_D)
+            dot = Dot(pos, radius=0.08, color=color)
             dots.append(dot)
 
         for i in range(len(dots)):
             start = dots[i].get_center()
             end = dots[(i + 1) % len(dots)].get_center()
-            line = Line(start, end, color=BLUE_D, stroke_width=2)
+            line = Line(start, end, color=color, stroke_width=2)
             lines.append(line)
 
         chord_fig = VGroup()

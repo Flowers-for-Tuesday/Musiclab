@@ -2,7 +2,7 @@ import os
 import uuid
 import subprocess
 import tempfile
-from music21 import stream
+from music21 import *
 
 class MusicAudio:
     def __init__(self, score: stream.Score, output_dir: str = "./wav_output"):
@@ -41,3 +41,30 @@ class MusicAudio:
             os.remove(midi_path)
         except OSError:
             pass
+
+class NoteAudio(MusicAudio):
+    def __init__(self, input_note, duration: float = 1.0,
+                 output_dir: str = "./wav_output",
+                 ):
+        """
+        参数:
+        - input_note: 一个音符名字符串（如 "C4"），或一个音符列表表示和弦（如 ["C3", "E3", "G3"]）
+        - duration: 音长（以四分音符为单位）
+        """
+        p = stream.Part()
+        if isinstance(input_note, str):
+            n = note.Note(input_note)
+            n.quarterLength = duration
+            p.append(n)
+        elif isinstance(input_note, (list, tuple)):
+            c = chord.Chord(input_note)
+            c.quarterLength = duration
+            p.append(c)
+        else:
+            raise ValueError("input_note 必须是字符串或字符串列表。")
+
+        s = stream.Score()
+        s.append(p)
+
+        # 调用父类构造器
+        super().__init__(s, output_dir=output_dir)

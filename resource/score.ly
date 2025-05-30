@@ -6,6 +6,8 @@
  }
   \layout{
    \omit Staff.Clef
+   \omit Staff.KeySignature
+   
  }
 \version "2.24.4"
 % automatically converted by musicxml2ly from C:\Users\XMZ\AppData\Local\Temp\score.musicxml
@@ -25,14 +27,14 @@
 
 PartPFivecFourTwoFourddOnebaSevencThreeThreeFiveTwoZeroNineSevenTwoNineacecbEightbOneOneSixTwoVoiceOne = 
 \relative c'' {
-    \clef "treble" \numericTimeSignature\time 4/4 \key c \major | % 1
+    \clef "treble" \numericTimeSignature\time 4/4 \key g \major | % 1
     \tempo 4=90 c4 e4 f4 g4 | % 2
     r4 -. a2 s2*5 \bar "|."
     }
 
 PartPEightdThreeSixcEighteTwodFiveSevenSevenNineEightZerocNineFiveFourNineFiveOneafFourSevenFiveEighteafSevenVoiceOne = 
 \relative c {
-    \clef "bass" \numericTimeSignature\time 4/4 \key c \major | % 1
+    \clef "bass" \numericTimeSignature\time 4/4 \key g \major | % 1
     <c e g>2 <f a c>2 | % 2
     <g b d>2 r4 c,4 | % 3
     <a e'>2 s4*7 \bar "|."

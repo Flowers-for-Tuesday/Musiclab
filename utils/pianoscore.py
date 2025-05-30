@@ -42,13 +42,13 @@ def piano_score(
 ) -> stream.Score:
     """
     创建一个空的 Score，包含指定声部和基础设置。
-    parts 是 ["Treble", "Bass"] 的子集。
+    parts 是 ["Treble", "Bass", "Alto"] 的子集。
     """
-    valid_parts = {"Treble", "Bass"}
+    valid_parts = {"Treble", "Bass", "Alto"}
     if not set(parts).issubset(valid_parts):
-        raise ValueError("parts must be subset of ['Treble', 'Bass']")
+        raise ValueError("parts must be subset of ['Treble', 'Bass', 'Alto']")
     if not parts:
-        raise ValueError("parts must contain at least one of ['Treble', 'Bass']")
+        raise ValueError("parts must contain at least one of ['Treble', 'Bass', 'Alto']")
     
     k = KEY_DICT.get(key_signature)
     if k is None:
@@ -61,10 +61,16 @@ def piano_score(
         p = stream.Part()
         p.id = part_name
         p.append(instrument.Piano())
+
         if part_name == "Treble":
             p.append(clef.TrebleClef())
-        else:
+        elif part_name == "Bass":
             p.append(clef.BassClef())
+        elif part_name == "Alto":
+            p.append(clef.AltoClef())
+        else:
+            raise ValueError(f"Unknown part name: {part_name}")
+
         p.append(k)
         p.append(meter.TimeSignature(time_signature))
         p.append(tempo.MetronomeMark(number=bpm))

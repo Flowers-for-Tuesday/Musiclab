@@ -25,6 +25,7 @@ class MusicTex(SVGMobject):
         barline_on=True,#是否有小节线
         clef_on=True,#是否有谱号
         timesignature_on=True,#是否有拍号
+        keysignature_on=True,#是否有调号
         staffsymbol_on=True,#是否有五线谱
         **kwargs
     ):
@@ -43,6 +44,7 @@ class MusicTex(SVGMobject):
         self.clef_on = clef_on
         self.timesignature_on = timesignature_on
         self.staffsymbol_on = staffsymbol_on
+        self.keysignature_on = keysignature_on
 
         # 保存 MusicXML
         self.musicxml_file = os.path.join(tmpdir, "score.musicxml")
@@ -102,6 +104,8 @@ class MusicTex(SVGMobject):
             output_lines.append('\\layout {\n  \\omit Staff.TimeSignature\n}\n\n')
         if not self.staffsymbol_on:
             output_lines.append('\\layout {\n  \\omit Staff.StaffSymbol\n}\n\n')
+        if not self.keysignature_on:
+            output_lines.append('\\layout {\n  \\omit Staff.KeySignature\n}\n\n')
 
         inside_header = False
         for line in lines:
@@ -147,7 +151,7 @@ class MusicTex(SVGMobject):
             return False
         
     def _fix_svg_lines(self, width=3):
-        "修复线条错误"
+        '''修复线条错误'''
         for submobj in self.submobjects:
             if isinstance(submobj, Line):
                 submobj.set_stroke(width=width)

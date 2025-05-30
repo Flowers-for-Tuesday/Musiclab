@@ -3,7 +3,7 @@ from manim import *
 
 def showlabel(svgmob):
     '''
-    用于展示SVGMobjects的sub对象标签,filename为输出文件名
+    用于展示SVGMobjects的sub对象标签
     '''
     bg = FullScreenRectangle(fill_color=WHITE, fill_opacity=1)
     labels = index_labels(svgmob)
