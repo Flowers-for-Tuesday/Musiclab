@@ -10,7 +10,7 @@ class AudioVisualizer(VGroup):
         duration: float = 5.0,
         num_bars: int = 20,
         time_per_frame: float = 0.1,
-        max_bar_height: float = 3.0,
+        max_bar_height: float = 2.0,
         bar_width: float = 0.08,
         spacing: float = 0.2,
         color: ManimColor = BLUE,
@@ -56,7 +56,8 @@ class AudioVisualizer(VGroup):
         return S_norm  # shape: (frames, num_bars)
 
     def get_animation(self):
-        animations = []
+        succession_list = []
+
         for t in range(self.spectrogram.shape[0]):
             frame = self.spectrogram[t]
             new_frame = VGroup()
@@ -69,8 +70,12 @@ class AudioVisualizer(VGroup):
                 bar.move_to(LEFT * (self.num_bars / 2 * self.spacing) + RIGHT * i * self.spacing)
                 bar.align_to(ORIGIN, DOWN)
                 new_frame.add(bar)
-            # 对应时间帧更新为新高度
-            for old_bar, new_bar in zip(self.bars, new_frame):
-                animations.append(old_bar.animate.become(new_bar))
-            animations.append(Wait(self.time_per_frame))
-        return AnimationGroup(*animations, lag_ratio=0.0)
+
+            frame_anims = [
+                old_bar.animate.become(new_bar)
+                for old_bar, new_bar in zip(self.bars, new_frame)
+            ]
+            succession_list.append(AnimationGroup(*frame_anims, lag_ratio=0.0))
+            succession_list.append(Wait(self.time_per_frame))
+
+        return Succession(*succession_list)
