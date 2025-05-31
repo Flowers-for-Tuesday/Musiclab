@@ -79,28 +79,65 @@ def piano_score(
 
     return sc
 
-def add_notes(
-    score: stream.Score,
-    part: str,
-    notes: list[tuple[str | list[str], float]]
-):
+def add_notes(score: stream.Score, part: str, notes):
     """
-    向 score 指定声部添加一个小节的音符序列。
-    notes 格式为 [(音名或和弦列表, 时值), ...]
+    向指定 score 的某个声部 part 添加一个小节的音符序列。
+    
+    支持两种格式的音符输入：
+    - 单个音符或休止符，格式为 (音高, 时值)，如 ("C4", 0.25) 或 ("rest", 0.5)
+    - 连杆组，格式为一个列表，内部元素为 (音高, 时值) 的元组列表，表示需要连杆的音符组
+    
+    函数会自动为连杆组内的音符设置 beams，手动指定连杆开始、持续和结束。
+    
+    参数:
+    - score: music21.stream.Score 对象，目标乐谱
+    - part: str，目标声部名称（需已存在于 score._part_dict 中）
+    - notes: list，音符或连杆组列表，示例：
+        [
+            ("rest", 0.5),
+            [("F#4", 0.25), ("A4", 0.25)],  # 连杆组
+            ("C5", 1.0),
+        ]
     """
     if not hasattr(score, "_part_dict"):
         raise ValueError("Score has no '_part_dict' attribute; use piano_score() to create score.")
     if part not in score._part_dict:
         raise ValueError(f"Part '{part}' not found in score.")
 
-    m = stream.Measure()
-    for pitch, dur in notes:
+    m = stream.Measure()  # 创建一个新小节
+
+    def create_note(pitch, dur):
+        """辅助函数，根据 pitch 和 dur 创建 Note、Chord 或 Rest 对象。"""
         if pitch == "rest":
             n = note.Rest()
-        elif isinstance(pitch, list):
+        elif isinstance(pitch, list):  # 如果是和弦音高列表
             n = chord.Chord(pitch)
         else:
             n = note.Note(pitch)
         n.quarterLength = dur
-        m.append(n)
+        return n
+
+    for entry in notes:
+        if isinstance(entry, tuple):
+            # 普通单音符或休止符，直接创建并添加
+            n = create_note(entry[0], entry[1])
+            m.append(n)
+        elif isinstance(entry, list):
+            # 这是一个连杆组，需要给其中的音符手动设置 beams
+            for i, (pitch, dur) in enumerate(entry):
+                n = create_note(pitch, dur)
+                # 连杆起始音符
+                if i == 0:
+                    n.beams.append('start')
+                # 连杆终止音符
+                elif i == len(entry) - 1:
+                    n.beams.append('stop')
+                # 连杆中间音符
+                else:
+                    n.beams.append('continue')
+                m.append(n)
+        else:
+            raise ValueError("Invalid entry in notes: must be tuple or list of tuples.")
+    
+    # 将新小节添加到指定声部
     score._part_dict[part].append(m)

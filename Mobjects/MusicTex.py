@@ -8,10 +8,10 @@ from manim import *
 
 __all__ = [
     "MusicTex",
-    "SCORE_WIDTH"
+    "SCORE_INTERVAL"
 ]
 
-SCORE_WIDTH = 0.2730748225013653  #musictex默认大小时两条谱线的间距
+SCORE_INTERVAL = 0.2730748225013653  #musictex默认大小时两条谱线的间距
 
 class MusicTex(SVGMobject):
     def __init__(
