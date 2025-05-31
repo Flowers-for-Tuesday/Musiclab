@@ -219,6 +219,36 @@ class MultiOctavePianoKeyboard(VGroup):
         mob.move_to(mob_key).align_to(mob_key, DOWN).shift(UP * buff)
         return mob
     
+    def markNotes(self, notes: str | Iterable[str], /, markColor: _MarkColorType | None = None):
+        """
+        高亮指定音符（如 "C4" 或 ["F4", "G#4"]）
+        """
+        if isinstance(notes, str):
+            notes = [notes]
+        keys = []
+        for n in notes:
+            midi = note.Note(n).pitch.midi
+            key = midi - (self.start_octave+1) * 12
+            if not (0 <= key < self.octaves * 12):
+                raise ValueError(f"Note '{n}' is out of range for current keyboard.")
+            keys.append(key)
+        return self.markKeys(keys, markColor=markColor)
+
+    def unmarkNotes(self, notes: str | Iterable[str]):
+        """
+        取消高亮指定音符
+        """
+        if isinstance(notes, str):
+            notes = [notes]
+        keys = []
+        for n in notes:
+            midi = note.Note(n).pitch.midi
+            key = midi - (self.start_octave+1) * 12
+            if not (0 <= key < self.octaves * 12):
+                raise ValueError(f"Note '{n}' is out of range for current keyboard.")
+            keys.append(key)
+        return self.unmarkKeys(keys)
+    
     def _add_labels(self):
         note_names = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"]
         for i in range(self.octaves*12):

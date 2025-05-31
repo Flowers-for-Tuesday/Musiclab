@@ -2,9 +2,8 @@
 *.txt
 *.pptx
 *.pdf
-1.py
-draft.py
-draft2.py
+[0-9]*.py
+draft*
 *.png
 *.wav
 *.psd
