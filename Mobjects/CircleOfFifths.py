@@ -1,6 +1,7 @@
 from manim import *
 from music21 import *
 from .MusicTex import *
+from typing import Literal
 import re
 
 __all__ = [
@@ -51,19 +52,28 @@ CHORD_DICT = {
     "dominant7":[0,8,6]
 }
 
-MajorLabels = [
+MajorLabels1 = [
             ("C", "C"), ("G", "G"), ("D", "D"), ("A", "A"), ("E", "E"), ("B", "B"),
-            ("F♯", "F#"), ("D♭", "Db"), ("A♭", "Ab"), ("E♭", "Eb"), ("B♭", "Bb"), ("F", "F")
+            ("F♯", "F#"), ("C♯", "C#"), ("A♭", "Ab"), ("E♭", "Eb"), ("B♭", "Bb"), ("F", "F")
         ]
-MinorLabels = [
+MajorLabels2 = [
+            ("C", "C"), ("G", "G"), ("D", "D"), ("A", "A"), ("E", "E"), ("C♭", "Cb"),
+            ("G♭", "Gb"), ("D♭", "Db"), ("A♭", "Ab"), ("E♭", "Eb"), ("B♭", "Bb"), ("F", "F")
+        ]
+MinorLabels1 = [
             ("a", "Am"), ("e", "Em"), ("b", "Bm"), ("f♯", "F#m"), ("c♯", "C#m"), ("g♯", "G#m"),
-            ("d♯", "D#m"), ("b♭", "Bbm"), ("f", "Fm"), ("c", "Cm"), ("g", "Gm"), ("d", "Dm")
+            ("d♯", "D#m"), ("a♯", "Abm"), ("f", "Fm"), ("c", "Cm"), ("g", "Gm"), ("d", "Dm")
         ]
+MinorLabels2 = [
+            ("a", "Am"), ("e", "Em"), ("b", "Bm"), ("f♯", "F#m"), ("c♯", "C#m"), ("a♭", "Abm"),
+            ("e♭", "Ebm"), ("b♭", "Bbm"), ("f", "Fm"), ("c", "Cm"), ("g", "Gm"), ("d", "Dm")
+        ]
+typedict = {"Major1":MajorLabels1,"Major2":MajorLabels2,"Minor1":MinorLabels1,"Minor2":MinorLabels2}
 
 class CircleOfFifths(VGroup):
     def __init__(
             self, 
-            type : str = "Major",
+            type: Literal["Major1","Major2", "Minor1","Minor2"] = "Major1",
             radius=1.5, 
             dot_radius=0.06,
             show_scores = False,# 是否显示乐谱
@@ -71,8 +81,9 @@ class CircleOfFifths(VGroup):
             ):
         super().__init__(**kwargs)
         self.type = type
-        self.labels = MajorLabels if type == "Major" else MinorLabels
+        self.labels = typedict[type]
         self.root_key = self.labels[0][1]
+        self.arrows = {}  # 存储箭头，键为 (from_idx, to_idx)
 
         # 标签内容（从C开始，顺时针，每隔纯五度）
 
@@ -120,6 +131,34 @@ class CircleOfFifths(VGroup):
         for mob in self.submobjects:
             if isinstance(mob, Text) or isinstance(mob, MusicTex):
                 mob.rotate(-angle, about_point=mob.get_center())
+
+    def markarrow(self, i: int, j: int, color=RED_A, stroke_width=3, tip_length=0.2):
+        """
+        在五度圈上从索引 i 指向 j 添加一条 CurvedArrow，自动弯曲角度。
+        """
+        if not hasattr(self, "arrows"):
+            self.arrows = {}
+
+        angle_i = i * TAU / 12
+        angle_j = j * TAU / 12
+        p1 = 1.2 * np.array([np.sin(angle_i), np.cos(angle_i), 0])
+        p2 = 1.2 * np.array([np.sin(angle_j), np.cos(angle_j), 0])
+
+        # 角度差用于控制弯曲方向与幅度
+        curve_angle  = angle_i - angle_j
+
+        arrow = CurvedArrow(p1, p2, angle=curve_angle, color=color, stroke_width=stroke_width, tip_length=tip_length)
+        self.add(arrow)
+        self.arrows[(i, j)] = arrow
+        return Create(arrow)
+
+    def unmarkarrow(self, i: int, j: int):
+        """
+        移除之前添加的从 i 到 j 的 CurvedArrow。
+        """
+        if hasattr(self, "arrows") and (i, j) in self.arrows:
+            arrow = self.arrows.pop((i, j))
+            return FadeOut(arrow)
 
     def show_chord(
             self,
