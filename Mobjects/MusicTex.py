@@ -3,7 +3,7 @@ import tempfile
 import music21
 import subprocess
 import shutil
-import uuid
+import hashlib
 from manim import *
 
 __all__ = [
@@ -37,8 +37,6 @@ class MusicTex(SVGMobject):
         svg_output_folder: SVG 输出目录
         kwargs: 传递给 SVGMobject 的其他参数
         """
-        self._tmp_dir = tempfile.TemporaryDirectory()
-        tmpdir = self._tmp_dir.name
 
         self.barline_on = barline_on 
         self.clef_on = clef_on
@@ -46,31 +44,43 @@ class MusicTex(SVGMobject):
         self.staffsymbol_on = staffsymbol_on
         self.keysignature_on = keysignature_on
 
-        # 保存 MusicXML
-        self.musicxml_file = os.path.join(tmpdir, "score.musicxml")
-        score.write("musicxml", fp=self.musicxml_file)
-
-        unique_prefix = f"score_{uuid.uuid4().hex[:8]}"
-        self.intermediate_ly = os.path.join(tmpdir, "score.ly")
-        self.processed_ly = os.path.join(tmpdir, "score_processed.ly")
-        self.svg_basename = unique_prefix
+        options = dict(
+            barline_on=barline_on,
+            clef_on=clef_on,
+            timesignature_on=timesignature_on,
+            staffsymbol_on=staffsymbol_on,
+            keysignature_on=keysignature_on,
+        )
+        cache_key = generate_cache_key(score, **options)
+        self.svg_basename = f"score_{cache_key}"
         self.svg_output_folder = svg_output_folder
         self.svg_output_path = os.path.join(self.svg_output_folder, f"{self.svg_basename}.svg")
 
-        # === 步骤 1: 转换为 .ly 文件 === #
-        if not self._convert_musicxml_to_ly(self.musicxml_file, self.intermediate_ly, python_executable, musicxml2ly_script):
-            raise RuntimeError("MusicXML 转换为 .ly 失败")
+        if os.path.isfile(self.svg_output_path):
+            print(f"缓存命中，直接使用 {self.svg_output_path}")
+        else:
+            self._tmp_dir = tempfile.TemporaryDirectory()
+            tmpdir = self._tmp_dir.name
+            # 保存 MusicXML
+            self.musicxml_file = os.path.join(tmpdir, "score.musicxml")
+            score.write("musicxml", fp=self.musicxml_file)
+            self.intermediate_ly = os.path.join(tmpdir, "score.ly")
+            self.processed_ly = os.path.join(tmpdir, "score_processed.ly")
 
-        # === 步骤 2: 处理 .ly 文件（去掉 header）=== #
-        self._process_ly_file(self.intermediate_ly, self.processed_ly)
+            # === 步骤 1: 转换为 .ly 文件 === #
+            if not self._convert_musicxml_to_ly(self.musicxml_file, self.intermediate_ly, python_executable, musicxml2ly_script):
+                raise RuntimeError("MusicXML 转换为 .ly 失败")
 
-        # === 步骤 3: 生成 SVG 文件 === #
-        if not self._generate_svg(lilypond_executable, self.processed_ly, self.svg_output_folder):
-            raise RuntimeError("生成 SVG 文件失败")
+            # === 步骤 2: 处理 .ly 文件（去掉 header）=== #
+            self._process_ly_file(self.intermediate_ly, self.processed_ly)
 
-        # === 步骤 4: 读取 SVG 文件 === #
-        if not os.path.isfile(self.svg_output_path):
-            raise FileNotFoundError(f"找不到生成的 SVG 文件: {self.svg_output_path}")
+            # === 步骤 3: 生成 SVG 文件 === #
+            if not self._generate_svg(lilypond_executable, self.processed_ly, self.svg_output_folder):
+                raise RuntimeError("生成 SVG 文件失败")
+
+            # === 步骤 4: 读取 SVG 文件 === #
+            if not os.path.isfile(self.svg_output_path):
+                raise FileNotFoundError(f"找不到生成的 SVG 文件: {self.svg_output_path}")
 
         super().__init__(file_name=self.svg_output_path, **kwargs)
         self._fix_svg_lines(line_width)#修复五线谱显示错误
@@ -158,6 +168,32 @@ class MusicTex(SVGMobject):
 
     def __del__(self):
         try:
-            self._tmp_dir.cleanup()
+            if hasattr(self, "_tmp_dir") and self._tmp_dir is not None:
+                self._tmp_dir.cleanup()
         except Exception:
             pass
+
+def extract_score_signature(score: music21.stream.Score) -> str:
+    parts = []
+
+    for el in score.recurse():
+        if isinstance(el, music21.clef.Clef):
+            parts.append(f"clef:{el.sign}-{el.line}")
+        elif isinstance(el, music21.key.KeySignature):
+            parts.append(f"key:{el.sharps}")
+        elif isinstance(el, music21.note.Note):
+            parts.append(f"note:{el.pitch.nameWithOctave}-{el.quarterLength}")
+        elif isinstance(el, music21.note.Rest):
+            parts.append(f"rest:{el.quarterLength}")
+
+    return "|".join(parts)
+
+def generate_cache_key(score: music21.stream.Score, **options) -> str:
+    signature = extract_score_signature(score)
+    hasher = hashlib.sha256()
+    hasher.update(signature.encode("utf-8"))
+
+    for k in sorted(options):
+        hasher.update(f"{k}={options[k]}".encode("utf-8"))
+
+    return hasher.hexdigest()[:16]

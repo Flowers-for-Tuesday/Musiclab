@@ -80,6 +80,7 @@ class CircleOfFifths(VGroup):
             **kwargs
             ):
         super().__init__(**kwargs)
+        self.radius = radius
         self.type = type
         self.labels = typedict[type]
         self.root_key = self.labels[0][1]
@@ -141,8 +142,8 @@ class CircleOfFifths(VGroup):
 
         angle_i = i * TAU / 12
         angle_j = j * TAU / 12
-        p1 = 1.2 * np.array([np.sin(angle_i), np.cos(angle_i), 0])
-        p2 = 1.2 * np.array([np.sin(angle_j), np.cos(angle_j), 0])
+        p1 = 0.8*self.radius * np.array([np.sin(angle_i), np.cos(angle_i), 0])
+        p2 = 0.8*self.radius * np.array([np.sin(angle_j), np.cos(angle_j), 0])
 
         # 角度差用于控制弯曲方向与幅度
         curve_angle  = angle_i - angle_j
