@@ -133,7 +133,7 @@ class CircleOfFifths(VGroup):
             if isinstance(mob, Text) or isinstance(mob, MusicTex):
                 mob.rotate(-angle, about_point=mob.get_center())
 
-    def markarrow(self, i: int, j: int, color=RED_A, stroke_width=3, tip_length=0.2):
+    def markarrow(self, i: int, j: int, color=RED_A, radius_ratio = 0.8 ,stroke_width=3, tip_length=0.2):
         """
         在五度圈上从索引 i 指向 j 添加一条 CurvedArrow，自动弯曲角度。
         """
@@ -142,8 +142,8 @@ class CircleOfFifths(VGroup):
 
         angle_i = i * TAU / 12
         angle_j = j * TAU / 12
-        p1 = 0.8*self.radius * np.array([np.sin(angle_i), np.cos(angle_i), 0])
-        p2 = 0.8*self.radius * np.array([np.sin(angle_j), np.cos(angle_j), 0])
+        p1 = self[0].get_center()+radius_ratio*self.radius * np.array([np.sin(angle_i), np.cos(angle_i), 0])
+        p2 = self[0].get_center()+radius_ratio*self.radius * np.array([np.sin(angle_j), np.cos(angle_j), 0])
 
         # 角度差用于控制弯曲方向与幅度
         curve_angle  = angle_i - angle_j
