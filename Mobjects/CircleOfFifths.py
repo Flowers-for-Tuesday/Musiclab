@@ -126,7 +126,7 @@ class CircleOfFifths(VGroup):
         current_index = next((i for i, (label, key_sig) in enumerate(self.labels) if key_sig == self.root_key), 0)
         delta_index = index-current_index
         angle = delta_index * TAU / 12  # 每个step为 30°
-        self.rotate(angle, about_point=ORIGIN)
+        self.rotate(angle, about_point=self[0].get_center())
         self.root_key = target_key
         # 文字逆向旋转保持不变
         for mob in self.submobjects:
