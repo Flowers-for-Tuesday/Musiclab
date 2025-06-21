@@ -94,9 +94,11 @@ def add_notes(score: stream.Score, part: str, notes):
     - part: str，目标声部名称（需已存在于 score._part_dict 中）
     - notes: list，音符或连杆组列表，示例：
         [
-            ("rest", 0.5),
+            ("rest", 0.5),#休止
             [("F#4", 0.25), ("A4", 0.25)],  # 连杆组
-            ("C5", 1.0),
+            ("C5", 1.0),#单音
+            (["C5","E5","G5"], 1.0),#和弦
+            ("C5", 1.0, ["staccato", "accent"]),#articulations
         ]
     """
     if not hasattr(score, "_part_dict"):
@@ -106,38 +108,62 @@ def add_notes(score: stream.Score, part: str, notes):
 
     m = stream.Measure()  # 创建一个新小节
 
-    def create_note(pitch, dur):
-        """辅助函数，根据 pitch 和 dur 创建 Note、Chord 或 Rest 对象。"""
+    def create_note(pitch, dur, arts=None):
+        """辅助函数，根据 pitch 和 dur 创建 Note、Chord 或 Rest 对象，附加 articulations。"""
         if pitch == "rest":
             n = note.Rest()
-        elif isinstance(pitch, list):  # 如果是和弦音高列表
+        elif isinstance(pitch, list):  # 和弦
             n = chord.Chord(pitch)
         else:
             n = note.Note(pitch)
+
         n.quarterLength = dur
+
+        # 添加 articulations（如 staccato, accent 等）
+        if arts:
+            art_map = {
+                "staccato": articulations.Staccato,
+                "tenuto": articulations.Tenuto,
+                "accent": articulations.Accent,
+                "marcato": articulations.StrongAccent,
+                "staccatissimo": articulations.Staccatissimo,
+                #"fermata": articulations.Fermata,
+                "spiccato": articulations.Spiccato,
+                "breath": articulations.BreathMark,
+                "caesura": articulations.Caesura,
+                #"portato": articulations.Portato,
+            }
+            for art_name in arts:
+                art_class = art_map.get(art_name.lower())
+                if art_class:
+                    n.articulations.append(art_class())
+
         return n
 
     for entry in notes:
         if isinstance(entry, tuple):
-            # 普通单音符或休止符，直接创建并添加
-            n = create_note(entry[0], entry[1])
+            # 格式: (pitch, dur) 或 (pitch, dur, [articulations])
+            pitch = entry[0]
+            dur = entry[1]
+            arts = entry[2] if len(entry) > 2 else None
+            n = create_note(pitch, dur, arts)
             m.append(n)
+
         elif isinstance(entry, list):
-            # 这是一个连杆组，需要给其中的音符手动设置 beams
-            for i, (pitch, dur) in enumerate(entry):
-                n = create_note(pitch, dur)
-                # 连杆起始音符
+            # 连杆组：[(pitch, dur), ...] 或 [(pitch, dur, [articulations]), ...]
+            for i, item in enumerate(entry):
+                pitch = item[0]
+                dur = item[1]
+                arts = item[2] if len(item) > 2 else None
+                n = create_note(pitch, dur, arts)
                 if i == 0:
                     n.beams.append('start')
-                # 连杆终止音符
                 elif i == len(entry) - 1:
                     n.beams.append('stop')
-                # 连杆中间音符
                 else:
                     n.beams.append('continue')
                 m.append(n)
         else:
             raise ValueError("Invalid entry in notes: must be tuple or list of tuples.")
-    
-    # 将新小节添加到指定声部
+
     score._part_dict[part].append(m)
