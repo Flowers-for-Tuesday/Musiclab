@@ -41,19 +41,42 @@ class BracketText(VGroup):
         text_buff: float = 0.4,
         text_size: float = 28,
         direction: Literal["UP", "DOWN"] = "UP",
+        aligned: bool = False,
         **kwargs
     ):
         super().__init__(**kwargs)
 
         dir_vec = UP if direction == "UP" else DOWN
 
-        p1 = mob1.get_center() + dir_vec * line_buff + dir_vec * line_height
-        p2 = mob2.get_center() + dir_vec * line_buff + dir_vec * line_height
+        # 物体中心
+        c1, c2 = mob1.get_center(), mob2.get_center()
 
-        vertical1 = Line(mob1.get_center() + dir_vec * line_buff, p1)
-        vertical2 = Line(mob2.get_center() + dir_vec * line_buff, p2)
-        horizontal = Line(p1, p2)
+        if aligned:
+            # 方向 UP: 以高的物体为基准线
+            if direction == "UP":
+                start_y = max(c1[1], c2[1]) + line_buff
+                end_y = start_y + line_height
+            else:
+                # DOWN: 以低的物体为基准线
+                start_y = min(c1[1], c2[1]) - line_buff
+                end_y = start_y - line_height
 
+            start1 = np.array([c1[0], start_y, c1[2]])
+            start2 = np.array([c2[0], start_y, c2[2]])
+            end1 = np.array([c1[0], end_y, c1[2]])
+            end2 = np.array([c2[0], end_y, c2[2]])
+        else:
+            # 原始逻辑
+            start1 = c1 + dir_vec * line_buff
+            start2 = c2 + dir_vec * line_buff
+            end1 = start1 + dir_vec * line_height
+            end2 = start2 + dir_vec * line_height
+
+        vertical1 = Line(start1, end1)
+        vertical2 = Line(start2, end2)
+        horizontal = Line(end1, end2)
+
+        # 标签
         label = text if isinstance(text, Mobject) else Text(text, font_size=text_size)
         label.move_to(horizontal.get_center() + dir_vec * text_buff)
 
