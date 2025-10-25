@@ -1,5 +1,8 @@
 *.mp4
 *.txt
+!requirements.txt
+*.doc
+*.docx
 *.pptx
 *.pdf
 [0-9]*.py
@@ -11,3 +14,6 @@ tempCodeRunnerFile.py
 __pycache__/
 Projects/
 resource/
+media/
+svg_output/
+wav_output/
