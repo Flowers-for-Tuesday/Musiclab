@@ -1,6 +1,6 @@
-.png
-.tex
-.log
+*.png
+*.tex
+*.log
 [0-9]*.py
 draft*
 tempCodeRunnerFile.py
